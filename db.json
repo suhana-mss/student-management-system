@@ -1,0 +1,11 @@
+{
+  "users": [
+    {
+      "username": "admin",
+      "password": "admin123",
+      "id": "31RWTBxf4dQ"
+    }
+  ],
+  "students": [],
+  "$schema": "./node_modules/json-server/schema.json"
+}

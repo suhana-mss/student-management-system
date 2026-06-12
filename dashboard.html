@@ -5,14 +5,33 @@
     <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
+    <nav>
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="./add-student.html">Add Student</a>
+        <a href="./view-students.html">View Students</a>
+        <a href="./logout.html">Logout</a>
+    </nav>
+    
     <h1>Dashboard</h1>
-    <p>Welcome to dashboard!</p>
-      <nav>
-       <a href="./add-student.html">Add Student</a>   
-     <a href="./view-students.html">View Students</a>
-       <a href="./edit-student.html">Edit Student</a>
-       <a href="./logout.html">Logout</a>
-      </nav>
+    <p id="welcomeMessage">Welcome to dashboard!</p>
+    
+    <script>
+        function checkLogin() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const currentUser = localStorage.getItem('currentUser');
+            
+            if (!isLoggedIn || !currentUser) {
+                alert('Please login first!');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            const user = JSON.parse(currentUser);
+            document.getElementById('welcomeMessage').textContent = 'Welcome, ' + user.username + '! to dashboard!';
+        }
+        
+        window.addEventListener('load', checkLogin);
+    </script>
 </body>
 </html>
     

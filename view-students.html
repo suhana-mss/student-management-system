@@ -2,79 +2,134 @@
 <html>
 <head>
     <title>View Students</title>
+    <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
+    <nav>
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="./add-student.html">Add Student</a>
+        <a href="./logout.html">Logout</a>
+    </nav>
+    
     <div class="box">
     <h1>View Students</h1>
    
-        <table>
-           
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Branch</th>
-            <th>CGPA</th>
-         
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>student1</td>
-            <td>student1@example.com</td>
-            <td>Computer Science</td>
-            <td>8.5</td>
-            <td>
-                <a href="./edit-student.html">
-
-                <button class="edit-btn">Edit</button>
-                </a>
-                <button class="delete-btn">Delete</button>
-            </td>
-        </tr>
-
-        <tr>
-            <td>student2</td>
-            <td>student2@example.com</td>
-            <td>Electrical Engineering</td>
-            <td>7.8</td>
-            <td>
-                 <a href="./edit-student.html">
-
-                <button class="edit-btn">Edit</button>
-                </a>
-                <button class="delete-btn">Delete</button>
-            </td>
-        </tr>
-
-                 <tr>
-                    <td>student3</td>
-                    <td>student3@example.com</td>
-                    <td>Mechanical Engineering</td>
-                    <td>8.2</td>
-                    <td>
-                <a href="./edit-student.html">
-
-                <button class="edit-btn">Edit</button>
-                </a>
-                <button class="delete-btn">Delete</button>
-            </td>
-                </tr>
-                <tr>
-                    <td>student4</td>
-                    <td>student4@example.com</td>
-                    <td>Civil Engineering</td>
-                    <td>7.9</td>
-                    <td>
-                <a href="./edit-student.html">
-                    <button class="edit-btn">Edit</button>
-                </a>
-                <button class="delete-btn">Delete</button>
-            </td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="search-container">
+        <div class="search-wrapper">
+            <input type="text" id="searchInput" placeholder="Search by name, email, or branch" class="search-input">
+            <div class="button-group">
+                <button onclick="filterStudents()" class="btn btn-primary">Search</button>
+                <button onclick="resetSearch()" class="btn btn-secondary">Reset</button>
+            </div>
+        </div>
+    </div>
+   
+    <table id="studentsTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Branch</th>
+                <th>CGPA</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+        </tbody>
+    </table>
     </div>
     <a href="./dashboard.html">Back to Dashboard</a>
+    
+    <script>
+    function loadStudents() {
+        const students = JSON.parse(localStorage.getItem('students')) || [];
+        const tableBody = document.getElementById('tableBody');
+        tableBody.innerHTML = '';
+        
+        if (students.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="5">No students found. <a href="./add-student.html">Add a student</a></td></tr>';
+            return;
+        }
+        
+        students.forEach(student => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${student.name}</td>
+                <td>${student.email}</td>
+                <td>${student.branch}</td>
+                <td>${student.cgpa}</td>
+                <td>
+                    <button class="edit-btn" onclick="editStudent(${student.id})">Edit</button>
+                    <button class="delete-btn" onclick="deleteStudent(${student.id})">Delete</button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+    
+    function deleteStudent(id) {
+        if (confirm('Are you sure you want to delete this student?')) {
+            let students = JSON.parse(localStorage.getItem('students')) || [];
+            students = students.filter(s => s.id !== id);
+            localStorage.setItem('students', JSON.stringify(students));
+            loadStudents();
+        }
+    }
+    
+    function editStudent(id) {
+        localStorage.setItem('editStudentId', id);
+        window.location.href = 'edit-student.html';
+    }
+    
+    function filterStudents() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+        const students = JSON.parse(localStorage.getItem('students')) || [];
+        const tableBody = document.getElementById('tableBody');
+        tableBody.innerHTML = '';
+        
+        if (!searchTerm) {
+            loadStudents();
+            return;
+        }
+        
+        const filtered = students.filter(student => 
+            student.name.toLowerCase().includes(searchTerm) ||
+            student.email.toLowerCase().includes(searchTerm) ||
+            student.branch.toLowerCase().includes(searchTerm)
+        );
+        
+        if (filtered.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="5">No students found matching your search.</td></tr>';
+            return;
+        }
+        
+        filtered.forEach(student => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${student.name}</td>
+                <td>${student.email}</td>
+                <td>${student.branch}</td>
+                <td>${student.cgpa}</td>
+                <td>
+                    <button class="edit-btn" onclick="editStudent(${student.id})">Edit</button>
+                    <button class="delete-btn" onclick="deleteStudent(${student.id})">Delete</button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+    
+    function resetSearch() {
+        document.getElementById('searchInput').value = '';
+        loadStudents();
+    }
+    
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            filterStudents();
+        }
+    });
+    window.addEventListener('load', loadStudents);
+    </script>
 </body>
 </html>

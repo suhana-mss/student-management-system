@@ -6,8 +6,8 @@
 </head>
 <body>
     <div class="box">
-    
     <h1>Login</h1>
+    <form id="loginForm">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required><br><br>
         
@@ -15,13 +15,49 @@
         <input type="password" id="password" name="password" required><br><br>
         
         <input type="submit" value="Login">
-        
-     
-        <a href="dashboard.html">
-            <button type="submit" id="btn1">Submit</button>
-        </a>
+    </form>
+    <div id="errorMessage" style="color: red; margin-top: 10px;"></div>
 
-    <p>Don't have an account? <a href="./register.html">Register here</a>.</p>
+    <p>Don't have an account<a href="./register.html">Register here</a>.</p>
     </div>
+    
+    <script>
+    const apiBaseUrl = 'http://localhost:3000';
+
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const errorDiv = document.getElementById('errorMessage');
+
+        errorDiv.textContent = '';
+
+        if (!username || !password) {
+            errorDiv.textContent = 'All fields are required.';
+            return;
+        }
+
+        try {
+            const response = await fetch(`${apiBaseUrl}/users?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`);
+            if (!response.ok) {
+                throw new Error(`Login request failed (${response.status})`);
+            }
+
+            const users = await response.json();
+
+            if (users.length > 0) {
+                localStorage.setItem('currentUser', JSON.stringify(users[0]));
+                localStorage.setItem('isLoggedIn', 'true');
+                window.location.href = 'dashboard.html';
+            } else {
+                errorDiv.textContent = 'Invalid username or password.';
+            }
+        } catch (err) {
+            errorDiv.textContent = 'Login failed: ' + err.message;
+            console.error(err);
+        }
+    });
+    </script>
 </body>
 </html>

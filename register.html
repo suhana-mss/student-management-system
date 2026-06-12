@@ -1,5 +1,4 @@
-<!-- register.html -->
- <html>
+<html>
     <head>
         <title>Register</title>
         <link rel="stylesheet" href="./styles.css">
@@ -7,7 +6,7 @@
     <body>
         <div class="box">
         <h1>Register</h1>
-       
+        <form id="registerForm">
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required><br><br>
             
@@ -16,11 +15,66 @@
             <label for="confirm_password">Confirm Password:</label>
             <input type="password" id="confirm_password" name="confirm_password" required><br><br>
             
-            
             <input type="submit" value="Register">
+        </form>
+        <div id="errorMessage" style="color: red; margin-top: 10px;"></div>
+        <div id="successMessage" style="color: green; margin-top: 10px;"></div>
        
-        <p>Already have an account? <a href="./login.html">Login here</a>.</p>
+        <p>Already have an account?<a href="./login.html">Login here</a>.</p>
         </div>
-    </body>
+        
+       <script>
+    const apiBaseUrl = 'http://localhost:3000';
+    const form = document.getElementById('registerForm');
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+
+    form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm_password').value;
+
+        errorMessage.textContent = '';
+        successMessage.textContent = '';
+
+        if (!username || !password || !confirmPassword) {
+            errorMessage.textContent = 'Please fill all the details.';
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            errorMessage.textContent = 'Passwords do not match.';
+            return;
+        }
+
+        try {
+            const response = await fetch(`${apiBaseUrl}/users`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                })
+            });
+
+            if (response.ok) {
+                successMessage.textContent = 'Registration successful! Redirecting to login...';
+                setTimeout(() => {
+                    window.location.href = './login.html';
+                }, 1000);
+            } else {
+                errorMessage.textContent = 'Registration failed. Status: ' + response.status;
+            }
+        } catch (error) {
+            errorMessage.textContent = 'Registration failed: ' + error.message;
+            console.error(error);
+        }
+    });
+</script>
+</body>
  </html>
  
